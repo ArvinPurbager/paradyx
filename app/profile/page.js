@@ -229,9 +229,15 @@ export default function ProfilePage() {
             <h1 className="text-2xl font-medium">{user.user_metadata?.full_name || user.user_metadata?.user_name || 'Developer'}</h1>
             <p className="text-gray-400 text-sm">{user.email}</p>
           </div>
-          <form action="/auth/signout" method="post" className="ml-auto">
-            <button type="submit" className="text-gray-500 hover:text-white text-sm underline">Sign out</button>
-          </form>
+          <button
+            onClick={async () => {
+              await supabase.auth.signOut()
+              window.location.href = '/login'
+            }}
+            className="ml-auto text-gray-500 hover:text-white text-sm underline"
+          >
+            Sign out
+          </button>
         </div>
 
         <WeeklyRecap logs={allLogs} />
