@@ -1,6 +1,10 @@
 import { createClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
 
+const MAX_CONTENT_LENGTH = 5000
+const COOLDOWN_MS = 2000
+const lastScored = new Map()
+
 export async function POST(request) {
   const supabase = await createClient()
 
@@ -9,10 +13,21 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
+  const now = Date.now()
+  const previous = lastScored.get(user.id)
+  if (previous && now - previous < COOLDOWN_MS) {
+    return NextResponse.json({ error: 'Slow down a moment before scoring again.' }, { status: 429 })
+  }
+  lastScored.set(user.id, now)
+
   const { log_id, content, entry_type } = await request.json()
 
   if (!content || !entry_type) {
     return NextResponse.json({ error: 'Missing content or entry_type' }, { status: 400 })
+  }
+
+  if (typeof content !== 'string' || content.length > MAX_CONTENT_LENGTH) {
+    return NextResponse.json({ error: 'Entry is too long to score.' }, { status: 400 })
   }
 
   // progress entries are unscored by design
