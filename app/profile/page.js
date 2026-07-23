@@ -279,7 +279,7 @@ export default function ProfilePage() {
       const day = date.getDay()
       const diff = date.getDate() - day + (day === 0 ? -6 : 1)
       const monday = new Date(new Date(commit.date).setDate(diff))
-      const key = monday.toISOString().split('T')[0]
+      const key = monday.getFullYear() + '-' + String(monday.getMonth() + 1).padStart(2, '0') + '-' + String(monday.getDate()).padStart(2, '0')
       if (!groups[key]) groups[key] = { commits: [], logs: [] }
       groups[key].commits.push(commit)
     })
@@ -288,7 +288,7 @@ export default function ProfilePage() {
       const day = date.getDay()
       const diff = date.getDate() - day + (day === 0 ? -6 : 1)
       const monday = new Date(new Date(log.created_at).setDate(diff))
-      const key = monday.toISOString().split('T')[0]
+      const key = monday.getFullYear() + '-' + String(monday.getMonth() + 1).padStart(2, '0') + '-' + String(monday.getDate()).padStart(2, '0')
       if (!groups[key]) groups[key] = { commits: [], logs: [] }
       groups[key].logs.push(log)
     })
@@ -573,7 +573,7 @@ export default function ProfilePage() {
             {groupByWeek(commits, logs).map(([weekStart, { commits: wCommits, logs: wLogs }]) => (
               <div key={weekStart}>
                 <div className="text-xs text-gray-500 uppercase tracking-widest mb-3">
-                  Week of {new Date(weekStart).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  Week of {new Date(weekStart + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </div>
                 <div className="space-y-2 border-l border-gray-800 pl-4">
                   {wCommits.map(commit => (
